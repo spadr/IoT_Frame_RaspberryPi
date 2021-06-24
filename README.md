@@ -17,6 +17,8 @@ $ cd IoT_Frame_ops
 #.env.exampleを.envにリネーム
 $ mv .env.example .env
 
+#.envのEmail設定をする
+
 #app/entrypoint.shの権限変更
 $ chmod +x app/entrypoint.sh
 
