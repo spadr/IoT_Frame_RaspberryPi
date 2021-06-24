@@ -9,7 +9,7 @@ Docker buildに小一時間かかります。<br>
 ### 動作確認のための手順
 ```
 #このリポジトリをGit cloneする
-$ git clone https://github.com/spadr/IoT_Frame_ops.git
+$ git clone https://github.com/spadr/IoT_Frame_RaspberryPi.git
 
 #cdを移動
 $ cd IoT_Frame_ops
