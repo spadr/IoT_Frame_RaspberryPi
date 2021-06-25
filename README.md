@@ -18,6 +18,14 @@ $ cd IoT_Frame_ops
 $ mv .env.example .env
 
 #.envのEmail設定をする
+以下を送信元にしたいメールアカウントに変更
+EMAIL_ADDRESS=user@xxmail.com
+EMAIL_HOST=smtp.xxmail.com
+EMAIL_HOST_USER=user
+EMAIL_HOST_PASSWORD=password
+EMAIL_PORT=587
+EMAIL_USE_TLS=False
+
 
 #app/entrypoint.shの権限変更
 $ chmod +x app/entrypoint.sh
