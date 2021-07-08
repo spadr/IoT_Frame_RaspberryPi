@@ -12,7 +12,7 @@ Docker buildに小一時間かかります。<br>
 $ git clone https://github.com/spadr/IoT_Frame_RaspberryPi.git
 
 #cdを移動
-$ cd IoT_Frame_ops
+$ cd IoT_Frame_RaspberryPi
 
 #.env.exampleを.envにリネーム
 $ mv .env.example .env
