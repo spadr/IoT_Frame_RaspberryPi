@@ -38,13 +38,35 @@ services:
     volumes:
       - static_volume:/usr/src/app/staticfiles
       - media_volume:/usr/src/app/mediafiles
-    ports:
-      - 80:81
+    #ports:
+    #  - 80:81
+    expose:
+      - 8100
     depends_on:
       - app
     networks:
       - front
 
+  https-portal:
+    container_name: https-portal
+    image: steveltn/https-portal
+    ports:
+      - "443:443"
+      - "80:80"
+    environment:
+      #STAGE: 'production'
+      STAGE: local
+      DOMAINS: 'example.com -> http://nginx:8100/'
+      TZ: Asia/Tokyo
+    networks:
+      - front
+    depends_on:
+      - nginx
+    volumes:
+      - ./https/example.com.conf.erb:/var/lib/nginx-conf/example.com.conf.erb:ro
+      - ./https/example.com.ssl.conf.erb:/var/lib/nginx-conf/example.com.ssl.conf.erb:ro
+      - ./https/ssl_certs:/var/lib/https-portal
+  
 volumes:
   db_data:
   static_volume:
