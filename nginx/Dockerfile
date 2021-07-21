@@ -14,8 +14,6 @@ RUN ./build.sh
 RUN ./configure
 RUN make && make install
 
-# NginxコネクタのダウンロードとModSecurityの
-# Dynamicモジュールとしてのコンパイル
 RUN git clone --depth 1 https://github.com/SpiderLabs/ModSecurity-nginx.git
 RUN wget http://nginx.org/download/nginx-1.21.1.tar.gz
 RUN tar zxvf nginx-1.21.1.tar.gz
@@ -31,7 +29,6 @@ COPY --from=builder /usr/lib/arm-linux-gnueabihf/libyajl.so.2.1.0 /usr/lib/arm-l
 COPY conf.d/nginx.conf /etc/nginx/nginx.conf
 
 
-# ModSecurityの推奨設定を取得する。
 COPY --from=builder /root/ModSecurity/modsecurity.conf-recommended ./modsecurity.conf
 RUN sed -i -e "s/SecRuleEngine DetectionOnly/SecRuleEngine On/g" modsecurity.conf && \
     mkdir -p /etc/nginx/modsecurity && \
@@ -49,5 +46,3 @@ RUN curl -OL https://github.com/coreruleset/coreruleset/archive/v3.3.0.tar.gz &&
     mv coreruleset /usr/local && \
     cp /usr/local/coreruleset/crs-setup.conf.example \ 
        /usr/local/coreruleset/crs-setup.conf
-
-#RUN nginx #-t
