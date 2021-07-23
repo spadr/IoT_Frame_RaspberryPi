@@ -1,0 +1,22 @@
+upstream my_nginx2 {
+    server nginx:8100;
+}
+
+server {
+    listen 443 ssl http2;
+    server_name 192.168.10.117;
+    ssl on;
+    ssl_certificate <%= domain.chained_cert_path %>;
+    ssl_certificate_key <%= domain.key_path %>;
+    ssl_protocols       TLSv1 TLSv1.1 TLSv1.2;
+    ssl_session_cache shared:SSL:50m;
+    ssl_ciphers ECDHE-RSA-AES256-GCM-SHA384:ECDHE-RSA-AES128-GCM-SHA256:DHE-RSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-SHA384:ECDHE-RSA-AES128-SHA256:ECDHE-RSA-AES256-SHA:ECDHE-RSA-AES128-SHA:DHE-RSA-AES256-SHA:DHE-RSA-AES128-SHA;
+    ssl_prefer_server_ciphers on;
+    ssl_dhparam <%= dhparam_path %>;
+    location / {
+        proxy_pass http://my_nginx2;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header Host $host;
+        proxy_redirect off;
+    }
+}

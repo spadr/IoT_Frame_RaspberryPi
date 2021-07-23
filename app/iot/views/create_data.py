@@ -1,6 +1,8 @@
 from django.contrib.auth.models import User
+from django.contrib.auth.decorators import login_required
 from django.conf import settings
 from django.http import HttpResponse, HttpResponseBadRequest
+from django.shortcuts import render, redirect
 from django.core import serializers
 
 from .models import IotModel
@@ -96,3 +98,27 @@ class DataSendApi(APIView):
         
         else:
             return Response(status=HTTP_401_UNAUTHORIZED)#project_idが一致しない場合のレスポンス
+
+
+@login_required
+def browserpostfunc(request):
+    now_timestamp = int(datetime.datetime.now().timestamp())
+    if request.method == "GET":#GETの処理
+        return HttpResponse()
+    
+    username = request.user.get_username()
+    t = User.objects.filter(username__contains=username).values_list('last_name', flat=True)
+    if request.method == "POST":#POSTの処理
+        device_name = request.POST['name']
+        device_channel = request.POST['channel']
+        device_value = request.POST['data']
+        #登録処理
+        IotModel.objects.create(long_id=str(t[0]),
+                                name=str(device_name),
+                                time=timezone.localtime(datetime.datetime.fromtimestamp(now_timestamp, UTC)),
+                                channel=str(device_channel),
+                                type =str('number'),
+                                data=str(device_value)
+                                )
+        
+        return redirect(request.META['HTTP_REFERER'])

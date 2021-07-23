@@ -80,7 +80,7 @@ $ sudo docker-compose -f docker-compose.yml restart
 $ sudo docker-compose -f docker-compose.yml ps -a
 
 #ログを確認
-$ sudo docker-compose -f docker-compose.yml log <image_name>
+$ sudo docker-compose -f docker-compose.yml logs <image_name>
 
 #コンテナ内のシェル
 $ sudo docker-compose -f docker-compose.yml exec <image_name> /bin/bash
