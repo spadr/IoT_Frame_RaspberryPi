@@ -117,76 +117,42 @@ def graphfunc(request):
         channels = [param_channel]
         channels_len = 1
     
-    if na_flag:
-        plot_list = []
-        for ch in channels:
+    plot_list = []
+    for ch in channels:
+        if na_flag:
             plot_db = IotModel.objects.filter(long_id__contains=t).filter(type='number', channel=ch).order_by('time').reverse()[:LIMIT_QUERY//channels_len]
-            df = read_frame(plot_db, fieldnames=['time', 'name', 'data'])
-            df_i = df.set_index('time')
-            df['time'] = df_i.index.tz_convert('Asia/Tokyo')
-            #データの形を整える
-            device_name = df['name'] 
-            device_name_set = device_name.drop_duplicates()
-            device_time = df['time']
-            device_content = df['data']
-            device_content_list = [device_content[device_name == i] for i in device_name_set]
-            device_time_list = [device_time[device_name == i] for i in device_name_set]
-            #グラフ描画
-            fig = go.Figure()
-            for c,j,n in zip(device_content_list , device_time_list , device_name_set):#デバイス毎にfor
-                data_y = []
-                data_x = []
-                for y,x in zip(np.array(c),np.array(j).flatten()):
-                    #数値以外が登録されていた場合は無視
-                    try:
-                        num = float(y)
-                        data_y.append(num)
-                    except:
-                        pass
-                    else:
-                        time = x
-                        data_x.append(time)
-                
-                fig.add_trace(go.Scatter(x=data_x, y=data_y, mode='lines+markers',name=str(n)))
-            
-            fig.update_layout(title_text=ch, title_x=0.5)
-            plot_fig = plot(fig, output_type='div', include_plotlyjs=False)
-            channel_data = {'plot':plot_fig}
-            plot_list.append(channel_data)
-    else:
-        plot_list = []
-        for ch in channels:
+        else:
             plot_db = IotModel.objects.filter(long_id__contains=t).filter(type='number', channel=ch, name=param_name).order_by('time').reverse()[:LIMIT_QUERY//channels_len]
-            df = read_frame(plot_db, fieldnames=['time', 'name', 'data'])
-            df_i = df.set_index('time')
-            df['time'] = df_i.index.tz_convert('Asia/Tokyo')
-            #データの形を整える
-            device_name = df['name'] 
-            device_name_set = device_name.drop_duplicates()
-            device_time = df['time']
-            device_content = df['data']
-            device_content_list = [device_content[device_name == i] for i in device_name_set]
-            device_time_list = [device_time[device_name == i] for i in device_name_set]
-            #グラフ描画
-            fig = go.Figure()
-            for c,j,n in zip(device_content_list , device_time_list , device_name_set):#デバイス毎にfor
-                data_y = []
-                data_x = []
-                for y,x in zip(np.array(c),np.array(j).flatten()):
-                    #数値以外が登録されていた場合は無視
-                    try:
-                        num = float(y)
-                        data_y.append(num)
-                    except:
-                        pass
-                    else:
-                        time = x
-                        data_x.append(time)
-                
-                fig.add_trace(go.Scatter(x=data_x, y=data_y, mode='lines+markers',name=str(n)))
+        df = read_frame(plot_db, fieldnames=['time', 'name', 'data'])
+        df_i = df.set_index('time')
+        df['time'] = df_i.index.tz_convert('Asia/Tokyo')
+        #データの形を整える
+        device_name = df['name'] 
+        device_name_set = device_name.drop_duplicates()
+        device_time = df['time']
+        device_content = df['data']
+        device_content_list = [device_content[device_name == i] for i in device_name_set]
+        device_time_list = [device_time[device_name == i] for i in device_name_set]
+        #グラフ描画
+        fig = go.Figure()
+        for c,j,n in zip(device_content_list , device_time_list , device_name_set):#デバイス毎にfor
+            data_y = []
+            data_x = []
+            for y,x in zip(np.array(c),np.array(j).flatten()):
+                #数値以外が登録されていた場合は無視
+                try:
+                    num = float(y)
+                    data_y.append(num)
+                except:
+                    pass
+                else:
+                    time = x
+                    data_x.append(time)
             
-            fig.update_layout(title_text=ch, title_x=0.5)
-            plot_fig = plot(fig, output_type='div', include_plotlyjs=False)
-            channel_data = {'plot':plot_fig}
-            plot_list.append(channel_data)
+            fig.add_trace(go.Scatter(x=data_x, y=data_y, mode='lines+markers',name=str(n)))
+        
+        fig.update_layout(title_text=ch, title_x=0.5)
+        plot_fig = plot(fig, output_type='div', include_plotlyjs=False)
+        channel_data = {'plot':plot_fig}
+        plot_list.append(channel_data)
     return render(request, 'graph.html', {'plot_gantt':plot_list ,'username':username})
