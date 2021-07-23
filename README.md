@@ -78,4 +78,10 @@ $ sudo docker-compose -f docker-compose.yml restart
 
 #稼働状況を確認
 $ sudo docker-compose -f docker-compose.yml ps -a
+
+#ログを確認
+$ sudo docker-compose -f docker-compose.yml logs <image_name>
+
+#コンテナ内のシェル
+$ sudo docker-compose -f docker-compose.yml exec <image_name> /bin/bash
 ```
