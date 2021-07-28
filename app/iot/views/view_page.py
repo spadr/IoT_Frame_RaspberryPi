@@ -64,8 +64,11 @@ def readfunc(request):
         user_db = NumberModel.objects.filter(device__user=request.user).order_by('time').reverse().select_related().values('time', 'device__channel', 'device__name', 'data')[:LIMIT_QUERY]
     
     df = read_frame(user_db)
-    df_i = df.set_index('time')
-    df['time'] = df_i.index.tz_convert('Asia/Tokyo')
+    try:
+        df_i = df.set_index('time')
+        df['time'] = df_i.index.tz_convert('Asia/Tokyo')
+    except:
+        pass
     df = df.rename(columns={'device__channel': 'channel', 'device__name': 'name'})
     html_object = df.to_html(classes='table table-light table-striped table-hover table-bordered table-responsive')
     profile = Profile.objects.get(user=request.user)
