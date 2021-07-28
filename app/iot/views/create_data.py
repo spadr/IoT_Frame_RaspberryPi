@@ -152,9 +152,19 @@ def browserpostfunc(request):
         device_name = request.POST['name']
         device_channel = request.POST['channel']
         device_value = request.POST['data']
-
-        device = DeviceModel.objects.get(user=request.user, channel=device_channel, name=device_name)
-
+        try:
+            device = DeviceModel.objects.get(user=request.user, channel=device_channel, name=device_name)
+        except:
+            device = DeviceModel.objects.create(user=request.user,
+                                                token=secrets.token_hex()+str(now_timestamp),
+                                                name=device_name,
+                                                channel=device_channel,
+                                                data_type='number',
+                                                is_active=True,
+                                                monitoring=False,
+                                                #interval=null,
+                                                activity=timezone.localtime(datetime.datetime.fromtimestamp(now_timestamp, UTC))
+                                                )
         #登録処理
         NumberModel.objects.create(device=device,
                                    time=timezone.localtime(datetime.datetime.fromtimestamp(now_timestamp, UTC)),
