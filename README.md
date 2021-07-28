@@ -37,13 +37,11 @@ $ sudo docker-compose -f docker-compose.yml up -d --build
 $ sudo docker-compose -f docker-compose.yml ps -a
 すべてUpになっていればOKです
 
+#死活監視スクリプトの実行
+$ sudo docker-compose -f docker-compose.yml exec app python manage.py alive_monitoring
 
-#実際にデータを送信する
-test.pyにsin,cos.tan波を送信するテスト用コードを記載しております。
-認証メールに記載されているアクセスキーを設定の上、お使いください。
-また、実際にマイコンを使って送信する場合は下記のリポジトリにサンプルコードがあります。
-https://github.com/spadr/CANASPAD-IoT_SAMPLE
 ```
+
 ### その他の操作
 ```
 #データの初期化
@@ -85,3 +83,4 @@ $ sudo docker-compose -f docker-compose.yml logs <image_name>
 #コンテナ内のシェル
 $ sudo docker-compose -f docker-compose.yml exec <image_name> /bin/bash
 ```
+

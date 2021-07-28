@@ -3,7 +3,9 @@ from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
 from django.conf import settings
 
-from .models import IotModel
+from .models import DeviceModel, NumberModel, ImageModel, Profile
+
+from .forms import ProfileForm
 
 import plotly.graph_objects as go
 from plotly.offline import plot
@@ -31,7 +33,6 @@ def memefunc(request):
 def readfunc(request):
     #ユーザーが登録したデータを取得
     username = request.user.get_username()
-    t =User.objects.filter(username__contains=username).values('last_name')
     parameter = request.GET
     parameter_l = len(parameter)
     flag = False
@@ -40,10 +41,11 @@ def readfunc(request):
     else:
         param_name = parameter['name']
         param_channel = parameter['channel']
-        all_name = list(IotModel.objects.filter(long_id__contains=t).distinct('name').values_list('name', flat=True))
+        all_name = list(DeviceModel.objects.filter(user=request.user).distinct('name').values_list('name', flat=True))
         all_name.append('$all')
-        all_channel = list(IotModel.objects.filter(long_id__contains=t).distinct('channel').values_list('channel', flat=True))
+        all_channel = list(DeviceModel.objects.filter(user=request.user).distinct('channel').values_list('channel', flat=True))
         all_channel.append('$all')
+        #all_device_id = list(DeviceModel.objects.filter(user=request.user).distinct('device_id').values_list('device_id', flat=True))
         not_known = not ((param_name in all_name) and (param_channel in all_channel))
         if not_known:
             flag = True
@@ -52,20 +54,28 @@ def readfunc(request):
                 if param_name == '$all':
                     flag = True
                 else:
-                    user_db = IotModel.objects.filter(long_id__contains=t, name=param_name).order_by('time').reverse()[:LIMIT_QUERY]
+                    user_db = NumberModel.objects.filter(device__user=request.user, device__name=param_name).order_by('time').reverse().select_related().values('time', 'device__channel', 'device__name', 'data')[:LIMIT_QUERY]
             else:
                 if param_name == '$all':
-                    user_db = IotModel.objects.filter(long_id__contains=t, channel=param_channel).order_by('time').reverse()[:LIMIT_QUERY]
+                    user_db = NumberModel.objects.filter(device__user=request.user, device__channel=param_channel).order_by('time').reverse().select_related().values('time', 'device__channel', 'device__name', 'data')[:LIMIT_QUERY]
                 else:
-                    user_db = IotModel.objects.filter(long_id__contains=t, name=param_name, channel=param_channel).order_by('time').reverse()[:LIMIT_QUERY]
+                    user_db = NumberModel.objects.filter(device__user=request.user, device__name=param_name, device__channel=param_channel).order_by('time').reverse().select_related().values('time', 'device__channel', 'device__name', 'data')[:LIMIT_QUERY]
     if flag:
-        user_db = IotModel.objects.filter(long_id__contains=t).order_by('time').reverse()[:LIMIT_QUERY]
+        user_db = NumberModel.objects.filter(device__user=request.user).order_by('time').reverse().select_related().values('time', 'device__channel', 'device__name', 'data')[:LIMIT_QUERY]
     
-    df = read_frame(user_db, fieldnames=['time', 'channel', 'name', 'data'])
+    df = read_frame(user_db)
     df_i = df.set_index('time')
     df['time'] = df_i.index.tz_convert('Asia/Tokyo')
+    df = df.rename(columns={'device__channel': 'channel', 'device__name': 'name'})
     html_object = df.to_html(classes='table table-light table-striped table-hover table-bordered table-responsive')
-    return render(request, 'detail.html', {'table':html_object ,'username':username})
+    profile = Profile.objects.get(user=request.user)
+    initial_data = {'alive_monitoring':profile.alive_monitoring,
+                    'send_message_to_email':profile.send_message_to_email,
+                    'line_token':profile.line_token,
+                    'send_message_to_line':profile.send_message_to_line
+                    }
+    profile_form = ProfileForm(request.POST or None,initial=initial_data)
+    return render(request, 'detail.html', {'table':html_object ,'username':username, "profile_form": profile_form})
 
 
 
@@ -74,7 +84,6 @@ def readfunc(request):
 def graphfunc(request):
     #ユーザーが登録したデータを取得
     username = request.user.get_username()
-    t =User.objects.filter(username__contains=username).values('last_name')
     parameter = request.GET
     parameter_l = len(parameter)
 
@@ -86,9 +95,9 @@ def graphfunc(request):
     else:
         param_name = parameter['name']
         param_channel = parameter['channel']
-        all_name = list(IotModel.objects.filter(long_id__contains=t).distinct('name').values_list('name', flat=True))
+        all_name = list(DeviceModel.objects.filter(user=request.user).distinct('name').values_list('name', flat=True))
         all_name.append('$all')
-        all_channel = list(IotModel.objects.filter(long_id__contains=t).distinct('channel').values_list('channel', flat=True))
+        all_channel = list(DeviceModel.objects.filter(user=request.user).distinct('channel').values_list('channel', flat=True))
         all_channel.append('$all')
         not_known = not ((param_name in all_name) and (param_channel in all_channel))
         if not_known:
@@ -111,7 +120,7 @@ def graphfunc(request):
                     na_flag = False
     
     if ch_flag:
-        channels = IotModel.objects.filter(long_id__contains=t).filter(type='number').distinct('channel').order_by('channel').values_list('channel', flat=True)
+        channels = DeviceModel.objects.filter(user=request.user, data_type='number').distinct('channel').order_by('channel').values_list('channel', flat=True)
         channels_len = len(channels)
     else:
         channels = [param_channel]
@@ -120,14 +129,14 @@ def graphfunc(request):
     plot_list = []
     for ch in channels:
         if na_flag:
-            plot_db = IotModel.objects.filter(long_id__contains=t).filter(type='number', channel=ch).order_by('time').reverse()[:LIMIT_QUERY//channels_len]
+            plot_db = NumberModel.objects.filter(device__user=request.user, device__data_type='number', device__channel=ch).order_by('time').reverse().select_related().values('time', 'device__name', 'data')[:LIMIT_QUERY//channels_len]
         else:
-            plot_db = IotModel.objects.filter(long_id__contains=t).filter(type='number', channel=ch, name=param_name).order_by('time').reverse()[:LIMIT_QUERY//channels_len]
-        df = read_frame(plot_db, fieldnames=['time', 'name', 'data'])
+            plot_db = NumberModel.objects.filter(device__user=request.user, device__data_type='number', device__channel=ch, device__name=param_name).order_by('time').reverse().select_related().values('time', 'device__name', 'data')[:LIMIT_QUERY//channels_len]
+        df = read_frame(plot_db)
         df_i = df.set_index('time')
         df['time'] = df_i.index.tz_convert('Asia/Tokyo')
         #データの形を整える
-        device_name = df['name'] 
+        device_name = df['device__name'] 
         device_name_set = device_name.drop_duplicates()
         device_time = df['time']
         device_content = df['data']
@@ -141,8 +150,7 @@ def graphfunc(request):
             for y,x in zip(np.array(c),np.array(j).flatten()):
                 #数値以外が登録されていた場合は無視
                 try:
-                    num = float(y)
-                    data_y.append(num)
+                    data_y.append(y)
                 except:
                     pass
                 else:
@@ -155,4 +163,11 @@ def graphfunc(request):
         plot_fig = plot(fig, output_type='div', include_plotlyjs=False)
         channel_data = {'plot':plot_fig}
         plot_list.append(channel_data)
-    return render(request, 'graph.html', {'plot_gantt':plot_list ,'username':username})
+    profile = Profile.objects.get(user=request.user)
+    initial_data = {'alive_monitoring':profile.alive_monitoring,
+                    'send_message_to_email':profile.send_message_to_email,
+                    'line_token':profile.line_token,
+                    'send_message_to_line':profile.send_message_to_line
+                    }
+    profile_form = ProfileForm(request.POST or None,initial=initial_data)
+    return render(request, 'graph.html', {'plot_gantt':plot_list ,'username':username, "profile_form": profile_form})

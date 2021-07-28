@@ -6,7 +6,7 @@
         <div class="m-3">
           <label for="modeselect" class="form-label">Mode</label>
           <input type="text" class="form-control" id="mode" aria-describedby="modeHelp" name="mode" required>
-          <div id="modeHelp" class="form-text">You can choose "download" and "delete".</div>
+          <div id="modeHelp" class="form-text">You can choose "download", "delete" and "select".</div>
         </div>
         <div class="m-3">
             <label for="chselect" class="form-label">Channel</label>
@@ -20,7 +20,7 @@
         </div>
         <div class="text-center">
           <div class="m-3">
-            <button type="submit" class="btn btn-warning">Submit</button>
+            <button type="submit" class="btn btn-danger">Submit</button>
           </div>
         </div>
       </form>
@@ -50,6 +50,21 @@
           </div>
         </div>
       </form>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="ProfileModal" tabindex="-1" aria-labelledby="ProfileModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="text-center">
+        <div class="m-3">
+          <form action="{% url 'profile' %}" method="POST">{% csrf_token %}
+            {{ profile_form.as_p }}
+            <button type="submit" class="btn btn-warning">Submit</button>
+          </form>
+        </div>
+      </div>
     </div>
   </div>
 </div>
