@@ -34,6 +34,7 @@ def save_user_profile(sender, instance, **kwargs):
     instance.profile.save()
 
 
+<<<<<<< HEAD
 
 class DeviceModel(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
@@ -60,3 +61,12 @@ class ImageModel(models.Model):
     time = models.DateTimeField()
     filename = models.CharField('File Name', max_length=100)
     image = models.ImageField('Photo', upload_to=get_photo_upload_path)
+=======
+class IotModel(models.Model):
+    long_id = models.CharField(max_length=100)
+    name = models.CharField(max_length=100)
+    time = models.DateTimeField()
+    channel = models.CharField(max_length=100)
+    type = models.CharField(max_length=100)
+    data = models.TextField()
+>>>>>>> def25fd97447de12832996abc177a3138cb443c3

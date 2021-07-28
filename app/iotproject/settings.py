@@ -195,6 +195,9 @@ SIMPLE_JWT = {
     'SLIDING_TOKEN_LIFETIME': timedelta(minutes=5),
     'SLIDING_TOKEN_REFRESH_LIFETIME': timedelta(days=1),
 }
+<<<<<<< HEAD
 
 
 
+=======
+>>>>>>> def25fd97447de12832996abc177a3138cb443c3
