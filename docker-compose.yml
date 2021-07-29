@@ -21,6 +21,7 @@ services:
     networks:
       - front
       - back
+    #restart: always
   
   db:
     image: postgres:12.0-alpine
@@ -30,6 +31,7 @@ services:
       - ./.env
     networks:
       - back
+    #restart: always
   
   nginx:
     build:
@@ -44,6 +46,7 @@ services:
       - app
     networks:
       - front
+    #restart: always
 
 volumes:
   db_data:
