@@ -31,8 +31,9 @@ $ sudo git submodule init
 $ sudo git submodule update
 
 #権限変更
-$ chmod +x app/entrypoint.sh
-$ sudo chmod 644 app/iot/migrations
+$ sudo chmod 777 app/iot/migrations
+$ sudo chmod 777 app
+$ sudo chmod +x app/entrypoint.sh
 
 #イメージをビルドし、各コンテナを起動
 $ sudo docker-compose -f docker-compose.yml up -d --build
