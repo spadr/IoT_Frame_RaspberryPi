@@ -1,8 +1,6 @@
 # IoT_Frame_RaspberryPi
 [IoT_Frame_ops](https://github.com/spadr/IoT_Frame_ops)
 で公開されているものをRaspberryPi向けに調節したものです。<br>
-Docker buildに小一時間かかります。<br>
-
 
 # Usage
 
