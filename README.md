@@ -26,15 +26,6 @@ EMAIL_HOST_PASSWORD=password
 EMAIL_PORT=587
 EMAIL_USE_TLS=False
 
-#サブディレクトリのpull
-$ sudo git submodule init
-$ sudo git submodule update
-
-#権限変更
-$ sudo chmod 777 app/iot/migrations
-$ sudo chmod 777 app
-$ sudo chmod +x app/entrypoint.sh
-
 #イメージをビルドし、各コンテナを起動
 $ sudo docker-compose -f docker-compose.yml up -d --build
 
