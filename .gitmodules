@@ -1,0 +1,3 @@
+[submodule "app"]
+	path = app
+	url = https://github.com/spadr/django_iot_core.git

@@ -1,8 +1,6 @@
 # IoT_Frame_RaspberryPi
 [IoT_Frame_ops](https://github.com/spadr/IoT_Frame_ops)
 で公開されているものをRaspberryPi向けに調節したものです。<br>
-Docker buildに小一時間かかります。<br>
-
 
 # Usage
 
@@ -26,9 +24,9 @@ EMAIL_HOST_PASSWORD=password
 EMAIL_PORT=587
 EMAIL_USE_TLS=False
 
-
-#app/entrypoint.shの権限変更
-$ chmod +x app/entrypoint.sh
+#ホストの設定
+httpsフォルダ内の.conf.erbと.ssl.conf.erbファイルを編集します
+ファイル名とserver_nameを自分の使いたいIPやドメインに書き換えます
 
 #イメージをビルドし、各コンテナを起動
 $ sudo docker-compose -f docker-compose.yml up -d --build
