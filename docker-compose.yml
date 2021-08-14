@@ -3,14 +3,12 @@ version: "3.7"
 services:
 
   app:
-    build:
-      context: ./app
-      dockerfile: Dockerfile_raspi
+    image: ghcr.io/spadr/django_iot_core:main@sha256:9f63222762f5a209062390448e9dadc7fb45356bb56b3aec9d2dc143fc049616
     command: gunicorn iotproject.wsgi:application --bind 0.0.0.0:8000 --workers=2
     working_dir: /usr/src/app/
     #restart: always
     volumes:
-      - ./app:/usr/src/app
+      #- ./app:/usr/src/app
       - static_volume:/usr/src/app/staticfiles
       - media_volume:/usr/src/app/mediafiles
     expose:
@@ -34,9 +32,7 @@ services:
       - back
   
   nginx:
-    build:
-      context: ./nginx
-      dockerfile: Dockerfile
+    image: ghcr.io/spadr/rasberrypi_nginx_modsecurity3:main
     #restart: always
     volumes:
       - static_volume:/usr/src/app/staticfiles
