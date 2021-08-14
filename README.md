@@ -25,8 +25,8 @@ EMAIL_PORT=587
 EMAIL_USE_TLS=False
 
 #ホストの設定
-httpsフォルダ内の.conf.erbと.ssl.conf.erbファイルを編集します
-ファイル名とserver_nameを自分の使いたいIPやドメインに書き換えます
+httpsフォルダ内の.conf.erbと.ssl.conf.erbファイル、docker-compose.ymlを編集します
+ファイル名とserver_name、DOMAINSを自分の使いたいIPやドメインに書き換えます
 
 #イメージをビルドし、各コンテナを起動
 $ sudo docker-compose -f docker-compose.yml up -d --build
