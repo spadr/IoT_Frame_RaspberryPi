@@ -32,7 +32,7 @@ services:
       - back
   
   nginx:
-    image: ghcr.io/spadr/rasberrypi_nginx_modsecurity3:main
+    image: ghcr.io/spadr/rasberrypi_nginx_modsecurity3@sha256:1a3341e7fda70c01e72eff91caaf38fe7bd4c43b0993b5c152f17dcb8780dcf2
     #restart: always
     volumes:
       - static_volume:/usr/src/app/staticfiles
